@@ -54,8 +54,18 @@
 
     <script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
   </div>
+  <script>
+  window.addEventListener('load', function() {
+    const messenger = document.querySelector('df-messenger');
+    if(messenger) {
+      messenger.setAttribute('agent-icon', 'https://raw.githubusercontent.com/janson-c/HariMeow/main/tiger.avif');
+    }
+  });
+</script>
+
 </body>
 </html>
+
 
 
 
