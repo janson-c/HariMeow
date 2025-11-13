@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>HariMeow Chatbot</title>
+
+  <!-- Optional small style to center the df-messenger widget for the hosted page -->
+  <style>
+    html,body { height:100%; margin:0; }
+    .wrapper { display:flex; align-items:flex-end; justify-content:center; height:100%; padding:16px; box-sizing:border-box; background:#f6f6f6; }
+    df-messenger {
+      --df-messenger-bot-message: #ffffff;
+      --df-messenger-font-color: #222;
+      --df-messenger-send-icon: #000;
+      --df-messenger-user-message: #e6f7ff;
+      --df-messenger-width: 375px; /* default width for iframe */
+      --df-messenger-height: 600px; /* default height for iframe */
+      border-radius:12px;
+      box-shadow:0 8px 24px rgba(0,0,0,0.12);
+      overflow:hidden;
+    }
+
+    /* Add bot avatar next to bot messages */
+    df-messenger .df-messenger-message.bot .message {
+      position: relative;
+      padding-left: 56px !important; /* space for avatar */
+    }
+    df-messenger .df-messenger-message.bot .message::before {
+      content: "";
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-image: url(https://raw.githubusercontent.com/janson-c/HariMeow/refs/heads/main/tiger.avif);
+      background-size: cover;
+      background-position: center;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.15);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <!-- DIALOGFLOW MESSENGER -->
+    <df-messenger
+      intent="WELCOME"
+      chat-title="HariMeow"
+      agent-id="dabea203-1958-4c0d-89d6-5490f4314805"
+      language-code="en"
+    ></df-messenger>
+
+    <script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
+  </div>
+</body>
+</html>
