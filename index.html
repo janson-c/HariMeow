@@ -57,38 +57,38 @@
 
   
   <!-- 🔥 Add the custom avatar script BELOW the wrapper -->
-  <script>
+    <script>
     window.addEventListener("df-messenger-loaded", function () {
       const bubble = document.querySelector("df-messenger-chat-bubble");
-
       if (!bubble) return;
 
-      const checkShadow = setInterval(() => {
+      const wait = setInterval(() => {
         const root = bubble.shadowRoot;
         if (!root) return;
 
-        const btn = root.querySelector(".df-chat-bubble-button");
-        if (!btn) return;
+        const button = root.querySelector(".df-chat-bubble-button");
+        if (!button) return;
 
-        clearInterval(checkShadow);
+        clearInterval(wait);
 
-        // Remove default icon
-        const svg = btn.querySelector("svg");
-        if (svg) svg.remove();
+        // Remove all inner icons
+        button.innerHTML = "";
 
-        // Apply custom icon
-        btn.style.backgroundImage =
-          'url("https://raw.githubusercontent.com/janson-c/HariMeow/main/tiger.avif")';
-        btn.style.backgroundSize = "cover";
-        btn.style.backgroundPosition = "center";
-        btn.style.backgroundRepeat = "no-repeat";
-        btn.style.borderRadius = "50%";
+        // Apply custom avatar image
+        button.style.backgroundImage =
+          'url("https://raw.githubusercontent.com/janson-c/HariMeow/main/cartoon%20avatar.jpeg")';
+        button.style.backgroundSize = "cover";
+        button.style.backgroundPosition = "center";
+        button.style.backgroundRepeat = "no-repeat";
+        button.style.width = "70px";
+        button.style.height = "70px";
+        button.style.borderRadius = "50%";
       }, 100);
     });
   </script>
-
 </body>
 </html>
+
 
 
 
