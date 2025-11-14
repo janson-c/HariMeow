@@ -67,8 +67,42 @@
 
     <script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
   </div>
+
+  
+  <!-- 🔥 Add the custom avatar script BELOW the wrapper -->
+  <script>
+    window.addEventListener("df-messenger-loaded", function () {
+      const bubble = document.querySelector("df-messenger-chat-bubble");
+
+      if (!bubble) return;
+
+      const checkShadow = setInterval(() => {
+        const root = bubble.shadowRoot;
+        if (!root) return;
+
+        const btn = root.querySelector(".df-chat-bubble-button");
+        if (!btn) return;
+
+        clearInterval(checkShadow);
+
+        // Remove default icon
+        const svg = btn.querySelector("svg");
+        if (svg) svg.remove();
+
+        // Apply custom icon
+        btn.style.backgroundImage =
+          'url("https://raw.githubusercontent.com/janson-c/HariMeow/main/tiger.avif")';
+        btn.style.backgroundSize = "cover";
+        btn.style.backgroundPosition = "center";
+        btn.style.backgroundRepeat = "no-repeat";
+        btn.style.borderRadius = "50%";
+      }, 100);
+    });
+  </script>
+
 </body>
 </html>
+
 
 
 
