@@ -50,16 +50,14 @@
 
   <script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
 
-  <script>
+<script>
     window.addEventListener("df-messenger-loaded", function () {
       
-      // First, find the df-messenger element. We know it's loaded now.
       const dfMessenger = document.querySelector("df-messenger");
       if (!dfMessenger) {
         console.error("Chatbot loaded event fired, but element not found!");
         return;
       }
-
       console.log("[DEBUG] Chatbot is loaded. Running custom code...");
 
       // ---
@@ -74,46 +72,70 @@
         if (!button) return;
         
         clearInterval(wait);
-
         button.innerHTML = "";
         button.style.backgroundImage =
           'url("https://raw.githubusercontent.com/janson-c/HariMeow/main/cartoon%20avatar.jpeg")';
-        button.style.backgroundSize = "cover";
-        button.style.backgroundPosition = "center";
-        button.style.backgroundRepeat = "no-repeat";
+        // ... (all your other avatar styles) ...
         button.style.width = "70px";
         button.style.height = "70px";
         button.style.borderRadius = "50%";
       }, 100);
 
       // ---
-      // PART 2: THE LANGUAGE SWITCHER CODE (Now added)
+      // PART 2: NEW "LOUDER" LANGUAGE SWITCHER
       // ---
       console.log("[DEBUG] Adding language switch listener...");
       
       dfMessenger.addEventListener('df-response-received', function (event) {
         
-        console.log("[DEBUG] Response received, checking for payload...");
-        const queryResult = event.detail.response.queryResult;
+        console.log("[DEBUG] Response received!");
+
+        // 1. Check for the main response object
+        if (!event.detail.response) {
+            console.error("[DEBUG] FATAL: event.detail.response is MISSING!");
+            return;
+        }
+
+        // 2. Check for the queryResult
+        if (!event.detail.response.queryResult) {
+            console.error("[DEBUG] FATAL: queryResult object is MISSING!");
+            console.log("[DEBUG] Full response object was:", event.detail.response);
+            return;
+        }
         
-        if (queryResult && queryResult.responseMessages) {
-          const payloadMsg = queryResult.responseMessages.find(m => m.payload);
+        console.log("[DEBUG] queryResult object was found.");
+        const queryResult = event.detail.response.queryResult;
+
+        // 3. This is the check that was failing.
+        if (!queryResult.responseMessages) {
+            console.error("[DEBUG] ERROR: queryResult.responseMessages is MISSING or empty!");
+            // We know the intent matched, so fulfillmentText MUST be here
+            console.log("[DEBUG] The bot's reply (fulfillmentText) was:", queryResult.fulfillmentText);
+            return;
+        }
+        
+        // 4. If we get this far, the problem IS the payload.
+        console.log("[DEBUG] responseMessages array was found. Checking for payloads...");
+        const messages = queryResult.responseMessages;
+
+        const payloadMsg = messages.find(m => m.payload);
+        
+        if (payloadMsg) {
+          console.log("[DEBUG] Payload was found in the response!", payloadMsg.payload);
+          const payload = payloadMsg.payload.fields;
           
-          if (payloadMsg) {
-            console.log("[DEBUG] Payload found!", payloadMsg.payload);
-            const payload = payloadMsg.payload.fields;
+          if (payload && payload.command && payload.command.stringValue === 'setLanguage') {
+            const newLang = payload.lang.stringValue;
             
-            if (payload && payload.command && payload.command.stringValue === 'setLanguage') {
-              const newLang = payload.lang.stringValue;
-              
-              // This is the magic line
-              console.log('Language switch signal received. Setting lang to:', newLang);
-              dfMessenger.lang = newLang; 
-            }
+            console.log('Language switch signal received. Setting lang to:', newLang);
+            dfMessenger.lang = newLang; 
+          } else {
+            console.log('[DEBUG] Payload found, but it was not the setLanguage command.');
           }
+        } else {
+          console.log('[DEBUG] No payload was found in this response.');
         }
       });
     });
   </script>
-</body>
-</html>
+
