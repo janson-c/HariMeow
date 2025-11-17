@@ -51,6 +51,7 @@
   <script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
 
 <script>
+    // This wrapper waits for the chatbot to be loaded
     window.addEventListener("df-messenger-loaded", function () {
       
       const dfMessenger = document.querySelector("df-messenger");
@@ -61,7 +62,7 @@
       console.log("[DEBUG] Chatbot is loaded. Running custom code...");
 
       // ---
-      // PART 1: YOUR AVATAR CODE (No changes)
+      // PART 1: YOUR AVATAR CODE (This part is unchanged)
       // ---
       const wait = setInterval(() => {
         const bubble = dfMessenger.shadowRoot.querySelector("df-messenger-chat-bubble");
@@ -75,73 +76,40 @@
         button.innerHTML = "";
         button.style.backgroundImage =
           'url("https://raw.githubusercontent.com/janson-c/HariMeow/main/cartoon%20avatar.jpeg")';
-        // ... (all your other avatar styles) ...
+        button.style.backgroundSize = "cover";
+        button.style.backgroundPosition = "center";
+        button.style.backgroundRepeat = "no-repeat";
         button.style.width = "70px";
         button.style.height = "70px";
         button.style.borderRadius = "50%";
       }, 100);
 
       // ---
-      // PART 2: NEW "FINAL DEBUG" LANGUAGE SWITCHER
+      // PART 2: THE "WORKAROUND" SWITCHER (This is the new part)
       // ---
-      console.log("[DEBUG] Adding language switch listener...");
+      console.log("[DEBUG] Adding language switch listener (Workaround Mode)...");
       
       dfMessenger.addEventListener('df-response-received', function (event) {
         
-        console.log("[DEBUG] Response received!");
-  
-        if (!event.detail.response) {
-            console.error("[DEBUG] FATAL: event.detail.response is MISSING!");
-            return;
+        if (!event.detail.response || !event.detail.response.queryResult) {
+            return; // Safety check
         }
         
         const queryResult = event.detail.response.queryResult;
-        if (!queryResult) {
-            console.error("[DEBUG] FATAL: queryResult object is MISSING!");
-            return;
-        }
+        const replyText = queryResult.fulfillmentText;
 
-        // --- NEW DEBUG ---
-        // Let's see what keys are ACTUALLY on the queryResult object
-        console.log("[DEBUG] queryResult object was found. Here are its keys:", Object.keys(queryResult));
-        // --- END NEW DEBUG ---
-
-        // Check for fulfillmentText
-        if (queryResult.fulfillmentText) {
-            console.log("[DEBUG] fulfillmentText was found:", queryResult.fulfillmentText);
-        } else {
-            console.log("[DEBUG] fulfillmentText was MISSING.");
-        }
-        
-        // Check for responseMessages
-        if (queryResult.responseMessages) {
-            console.log("[DEBUG] responseMessages was found. Length:", queryResult.responseMessages.length);
-        } else {
-            console.log("[DEBUG] responseMessages was MISSING.");
-        }
-
-        // Now, try the original logic
-        if (queryResult.responseMessages && queryResult.responseMessages.length > 0) {
-            console.log("[DEBUG] responseMessages array is valid. Checking for payload...");
-            const messages = queryResult.responseMessages;
-            const payloadMsg = messages.find(m => m.payload);
-            
-            if (payloadMsg) {
-                console.log("[DEBUG] Payload found!", payloadMsg.payload);
-                const payload = payloadMsg.payload.fields;
-                if (payload && payload.command && payload.command.stringValue === 'setLanguage') {
-                    const newLang = payload.lang.stringValue;
-                    console.log('Language switch signal received. Setting lang to:', newLang);
-                    dfMessenger.lang = newLang; 
-                }
-            } else {
-                console.log('[DEBUG] No payload was found in this response.');
-            }
-        } else {
-            console.log('[DEBUG] responseMessages array is missing or empty. Cannot check for payload.');
+        // Make sure these text strings are *exactly* what your bot replies
+        if (replyText === "Okay, switching to Mandarin") {
+            console.log("[WORKAROUND] Matched English text. Setting lang to zh-CN");
+            dfMessenger.lang = 'zh-CN';
+        } 
+        else if (replyText === "好的，换成英文。") { // <-- CHECK THIS TEXT
+            console.log("[WORKAROUND] Matched Mandarin text. Setting lang to en");
+            dfMessenger.lang = 'en';
         }
       });
     });
   </script>
+
 
 
