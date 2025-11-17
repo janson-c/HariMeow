@@ -82,60 +82,66 @@
       }, 100);
 
       // ---
-      // PART 2: NEW "LOUDER" LANGUAGE SWITCHER
+      // PART 2: NEW "FINAL DEBUG" LANGUAGE SWITCHER
       // ---
       console.log("[DEBUG] Adding language switch listener...");
       
       dfMessenger.addEventListener('df-response-received', function (event) {
         
         console.log("[DEBUG] Response received!");
-
-        // 1. Check for the main response object
+  
         if (!event.detail.response) {
             console.error("[DEBUG] FATAL: event.detail.response is MISSING!");
             return;
         }
-
-        // 2. Check for the queryResult
-        if (!event.detail.response.queryResult) {
-            console.error("[DEBUG] FATAL: queryResult object is MISSING!");
-            console.log("[DEBUG] Full response object was:", event.detail.response);
-            return;
-        }
         
-        console.log("[DEBUG] queryResult object was found.");
         const queryResult = event.detail.response.queryResult;
-
-        // 3. This is the check that was failing.
-        if (!queryResult.responseMessages) {
-            console.error("[DEBUG] ERROR: queryResult.responseMessages is MISSING or empty!");
-            // We know the intent matched, so fulfillmentText MUST be here
-            console.log("[DEBUG] The bot's reply (fulfillmentText) was:", queryResult.fulfillmentText);
+        if (!queryResult) {
+            console.error("[DEBUG] FATAL: queryResult object is MISSING!");
             return;
         }
-        
-        // 4. If we get this far, the problem IS the payload.
-        console.log("[DEBUG] responseMessages array was found. Checking for payloads...");
-        const messages = queryResult.responseMessages;
 
-        const payloadMsg = messages.find(m => m.payload);
-        
-        if (payloadMsg) {
-          console.log("[DEBUG] Payload was found in the response!", payloadMsg.payload);
-          const payload = payloadMsg.payload.fields;
-          
-          if (payload && payload.command && payload.command.stringValue === 'setLanguage') {
-            const newLang = payload.lang.stringValue;
-            
-            console.log('Language switch signal received. Setting lang to:', newLang);
-            dfMessenger.lang = newLang; 
-          } else {
-            console.log('[DEBUG] Payload found, but it was not the setLanguage command.');
-          }
+        // --- NEW DEBUG ---
+        // Let's see what keys are ACTUALLY on the queryResult object
+        console.log("[DEBUG] queryResult object was found. Here are its keys:", Object.keys(queryResult));
+        // --- END NEW DEBUG ---
+
+        // Check for fulfillmentText
+        if (queryResult.fulfillmentText) {
+            console.log("[DEBUG] fulfillmentText was found:", queryResult.fulfillmentText);
         } else {
-          console.log('[DEBUG] No payload was found in this response.');
+            console.log("[DEBUG] fulfillmentText was MISSING.");
+        }
+        
+        // Check for responseMessages
+        if (queryResult.responseMessages) {
+            console.log("[DEBUG] responseMessages was found. Length:", queryResult.responseMessages.length);
+        } else {
+            console.log("[DEBUG] responseMessages was MISSING.");
+        }
+
+        // Now, try the original logic
+        if (queryResult.responseMessages && queryResult.responseMessages.length > 0) {
+            console.log("[DEBUG] responseMessages array is valid. Checking for payload...");
+            const messages = queryResult.responseMessages;
+            const payloadMsg = messages.find(m => m.payload);
+            
+            if (payloadMsg) {
+                console.log("[DEBUG] Payload found!", payloadMsg.payload);
+                const payload = payloadMsg.payload.fields;
+                if (payload && payload.command && payload.command.stringValue === 'setLanguage') {
+                    const newLang = payload.lang.stringValue;
+                    console.log('Language switch signal received. Setting lang to:', newLang);
+                    dfMessenger.lang = newLang; 
+                }
+            } else {
+                console.log('[DEBUG] No payload was found in this response.');
+            }
+        } else {
+            console.log('[DEBUG] responseMessages array is missing or empty. Cannot check for payload.');
         }
       });
     });
   </script>
+
 
