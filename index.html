@@ -1,52 +1,48 @@
-<body>
+<script>
+  // Select the df-messenger element
+  const dfMessenger = document.querySelector('df-messenger');
 
-  <df-messenger
-    intent="WELCOME"
-    chat-title="HariMeow"
-    agent-id="dabea203-1958-4c0d-89d6-5490f4314805"
-    language-code="en"
-  ></df-messenger>
+  if (dfMessenger) {
+    console.log('[DEBUG] "catch" script is loaded and dfMessenger is found.');
 
-  <script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
-
-  <script>
-    window.addEventListener("df-messenger-loaded", function () {
-      // ... (all your avatar-fixing code is in here) ...
-      // ... (no changes needed here) ...
-    });
-  </script>
-
-
-  <script>
-    // 1. Select the df-messenger element
-    const dfMessenger = document.querySelector('df-messenger');
-
-    // 2. Add an event listener to check every response from the bot
+    // Add an event listener to check every response from the bot
     dfMessenger.addEventListener('df-response-received', function (event) {
       
-      // 3. Check the response messages for a payload
-      const messages = event.detail.response.queryResult.responseMessages;
-      if (!messages) return;
+      console.log('[DEBUG] df-response-received event was fired!');
+      console.log('[DEBUG] Full response data:', event.detail.response);
 
-      // Find the first message that has a 'payload'
-      const payloadMsg = messages.find(m => m.payload);
-      if (!payloadMsg) return;
-
-      // 4. Check if the payload is our "setLanguage" command
-      // Note: We have to dig into 'fields' and 'stringValue'
-      const payload = payloadMsg.payload.fields;
-      if (payload && payload.command.stringValue === 'setLanguage') {
+      const queryResult = event.detail.response.queryResult;
+      
+      // Check if responseMessages exists
+      if (queryResult && queryResult.responseMessages) {
         
-        // 5. Get the new language from the payload
-        const newLang = payload.lang.stringValue;
-        console.log('Language switch signal received. Setting lang to:', newLang);
+        console.log('[DEBUG] Checking for payloads...');
+        const messages = queryResult.responseMessages;
 
-        // 6. This is the magic line!
-        // It updates the widget's language attribute.
-        // All future messages will now use this language.
-        dfMessenger.lang = newLang;
+        const payloadMsg = messages.find(m => m.payload);
+        
+        if (payloadMsg) {
+          console.log('[DEBUG] Payload was found in the response!', payloadMsg.payload);
+          
+          const payload = payloadMsg.payload.fields;
+          
+          if (payload && payload.command && payload.command.stringValue === 'setLanguage') {
+            const newLang = payload.lang.stringValue;
+            
+            console.log('Language switch signal received. Setting lang to:', newLang);
+            dfMessenger.lang = newLang;
+            
+          } else {
+            console.log('[DEBUG] Payload found, but it was not the setLanguage command.');
+          }
+        } else {
+          console.log('[DEBUG] No payload was found in this response.');
+        }
+      } else {
+        console.log('[DEBUG] No responseMessages found in this response.');
       }
     });
-  </script>
-
-</body>
+  } else {
+    console.error('[DEBUG] FAILED to find df-messenger element!');
+  }
+</script>
